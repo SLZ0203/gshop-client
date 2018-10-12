@@ -7,6 +7,5 @@ export default {
   address: {}, // 地址信息对象
   categorys: [], // 分类数组
   shops: [], //商家数组
-  userInfo: {}, // 用户信息
-  captcha: {}, //一次性验证码
+  user: {}, // 用户信息
 }

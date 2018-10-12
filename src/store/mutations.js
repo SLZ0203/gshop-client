@@ -5,8 +5,7 @@ import {
   RECEIVE_ADDRESS,
   RECEIVE_CATEGORYS,
   RECEIVE_SHOPS,
-  RECEIVE_CAPTCHA,
-  RECEIVE_USER_INFO
+  RECEIVE_USER
 } from './mutation-types'
 
 export default {
@@ -20,11 +19,8 @@ export default {
   [RECEIVE_SHOPS] (state, {shops}) {
     state.shops = shops
   },
-  [RECEIVE_CAPTCHA] (state, {captcha}) {
-    state.captcha = captcha
-  },
-  [RECEIVE_USER_INFO] (state, {userInfo}) {
-    state.userInfo = userInfo
+  [RECEIVE_USER] (state, {user}) {
+    state.user = user
   },
 
 }

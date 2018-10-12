@@ -9,7 +9,6 @@
   const CLASS_OFF = 'off';
 
   export default {
-    // 设计props
     props: {
       score: Number,
       size: Number
@@ -24,7 +23,7 @@
           scs.push(CLASS_ON)
         }
         // 添加类名CLASS_HALF
-        if (score - scoreInteger >= 0.5) {
+        if (score*10 - scoreInteger*10 >= 5) {
           scs.push(CLASS_HALF)
         }
         // 添加类名CLASS_OFF

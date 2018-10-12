@@ -12,14 +12,14 @@
         <form>
           <div :class="{on: loginWay}">
             <section class="login_message">
-              <input type="tel" maxlength="11" placeholder="手机号" v-model="phone">
+              <input type="text" maxlength="11" placeholder="手机号" v-model="phone">
               <button :disabled="!isRightPhone || computeTime>0" class="get_verification"
                       :class="{right_phone_number: isRightPhone}" @click="sendCode">
                 {{computeTime > 0 ? `已发送(${computeTime}s)` : '获取验证码'}}
               </button>
             </section>
             <section class="login_verification">
-              <input type="tel" maxlength="8" placeholder="验证码">
+              <input type="text" maxlength="8" placeholder="验证码" v-model="code">
             </section>
             <section class="login_hint">
               温馨提示：未注册硅谷外卖帐号的手机号，登录时将自动注册，且代表已同意
@@ -29,22 +29,23 @@
           <div :class="{on : !loginWay}">
             <section>
               <section class="login_message">
-                <input type="tel" maxlength="11" placeholder="手机/邮箱/用户名">
+                <input type="tel" maxlength="11" placeholder="手机/邮箱/用户名" v-model="name">
               </section>
               <section class="login_verification">
-                <input :type="isShowPwd ? 'text' : 'password'" maxlength="8" placeholder="密码">
+                <input :type="isShowPwd ? 'text' : 'password'" maxlength="8" placeholder="密码" v-model="pwd">
                 <div class="switch_button" @click="isShowPwd = !isShowPwd" :class="isShowPwd ? 'on' : 'off'">
                   <div class="switch_circle" :class="{right: isShowPwd}"></div>
                   <span class="switch_text">{{isShowPwd ? 'abc' : '...'}}</span>
                 </div>
               </section>
               <section class="login_message">
-                <input type="text" maxlength="11" placeholder="验证码">
-                <img class="get_verification" src="./images/captcha.svg" alt="captcha">
+                <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
+                <img class="get_verification" src="http://localhost:4000/captcha" alt="captcha"
+                     @click="updataCaptcha" ref="captcha">
               </section>
             </section>
           </div>
-          <button class="login_submit">登录</button>
+          <button class="login_submit" @click.prevent="login">登录</button>
         </form>
         <a href="javascript:;" class="about_us">关于我们</a>
       </div>
@@ -55,16 +56,24 @@
   </section>
 </template>
 <script>
+  import {Toast, MessageBox} from 'mint-ui';
+
+
   export default {
     data() {
       return {
         loginWay: true,
         phone: '',
         computeTime: 0,
-        isShowPwd: false
+        isShowPwd: false,
+        name: '',
+        pwd: '',
+        code: '',
+        captcha: ''
       }
     },
     methods: {
+      //发送短信验证码
       sendCode() {
         this.computeTime = 30;
         const intervalId = setInterval(() => {
@@ -74,6 +83,35 @@
           }
           this.computeTime--
         }, 1000)
+      },
+
+      //获取图形验证码
+      updataCaptcha() {
+        this.$refs.captcha.src = 'http://localhost:4000/captcha?time=' + Date.now()
+      },
+
+      //请求登陆
+      login() {
+        if (this.loginWay) { //短信登陆
+          const {phone, code} = this;
+          if (!this.isRightPhone) {
+            return MessageBox.alert('请输入正确的手机号！')
+          } else if (!/^\d{6}$/.test(code)) {
+            return MessageBox.alert('请输入正确的验证码！')
+          }
+
+        } else { //密码登陆
+          const {name, pwd, captcha} = this;
+          if (!name) {
+            return MessageBox.alert('请输入用户名！')
+          } else if (!pwd) {
+            return MessageBox.alert('请输入密码！')
+          } else if (!/^.{4}$/.test(captcha)) {
+            return MessageBox.alert('请输入正确的验证码！')
+          }
+        }
+
+
       }
     },
     computed: {

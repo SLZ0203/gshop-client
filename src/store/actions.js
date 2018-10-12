@@ -5,16 +5,13 @@ import {
   reqAddress,
   reqFoodCategorys,
   reqShops,
-  reqUsers,
-  reqCaptcha
 } from '../api'
 
 import {
   RECEIVE_SHOPS,
   RECEIVE_CATEGORYS,
   RECEIVE_ADDRESS,
-  RECEIVE_USER_INFO,
-  RECEIVE_CAPTCHA
+  RECEIVE_USER,
 } from './mutation-types'
 
 export default {
@@ -50,23 +47,9 @@ export default {
     }
   },
 
-  // 异步获取captcha
-  async getCaptcha({commit}) {
-    // 发送ajax请求
-    const result = await reqCaptcha();
-    if (result.code === 0) {
-      const captcha = result.data;
-      commit(RECEIVE_CAPTCHA, {captcha})
-    }
-  },
+  //同步保存用户信息
+  saveUser({commit}, user) {
+    commit(RECEIVE_USER, {user})
+  }
 
-  // 异步获取userInfo
-  async getUserInfo({commit}) {
-    // 发送ajax请求
-    const result = await reqUsers();
-    if (result.code === 0) {
-      const users = result.data;
-      commit(RECEIVE_USER_INFO, {users})
-    }
-  },
 }
