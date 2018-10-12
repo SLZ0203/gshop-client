@@ -57,7 +57,7 @@
 </template>
 <script>
   import {Toast, MessageBox} from 'mint-ui';
-
+  import {reqPwdLogin, reqSendCode, reqSmsLogin} from '../../api'
 
   export default {
     data() {
@@ -91,7 +91,9 @@
       },
 
       //请求登陆
-      login() {
+      async login() {
+        let result;
+
         if (this.loginWay) { //短信登陆
           const {phone, code} = this;
           if (!this.isRightPhone) {
@@ -99,7 +101,8 @@
           } else if (!/^\d{6}$/.test(code)) {
             return MessageBox.alert('请输入正确的验证码！')
           }
-
+          //发送请求登陆
+          result = await reqSmsLogin(phone, code)
         } else { //密码登陆
           const {name, pwd, captcha} = this;
           if (!name) {
@@ -109,9 +112,23 @@
           } else if (!/^.{4}$/.test(captcha)) {
             return MessageBox.alert('请输入正确的验证码！')
           }
+          //发送请求登陆
+          result = await reqPwdLogin(name, pwd, captcha);
+          //请求结束后，停止倒计时
+          this.computeTime = 0;
+          //更新图形验证码
+          this.updataCaptcha();
+          //根据请求结果进行相应的处理
+          if (result.code === 0) {
+            const user = result.data;
+            //保存用户信息到user中
+            this.$store.dispatch('saveUser',user);
+            //跳转到个人中心页面
+            this.$router.replace('/profile')
+          } else {
+            MessageBox.alert(result.msg)
+          }
         }
-
-
       }
     },
     computed: {

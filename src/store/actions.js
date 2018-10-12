@@ -5,6 +5,7 @@ import {
   reqAddress,
   reqFoodCategorys,
   reqShops,
+  reqUser
 } from '../api'
 
 import {
@@ -50,6 +51,14 @@ export default {
   //同步保存用户信息
   saveUser({commit}, user) {
     commit(RECEIVE_USER, {user})
-  }
+  },
 
+  //异步获取用户的action
+  async getUser({commit}) {
+    const result = await reqUser();
+    if (result.code === 0) {
+      const user = result.data;
+      commit(RECEIVE_USER, {user})
+    }
+  },
 }
