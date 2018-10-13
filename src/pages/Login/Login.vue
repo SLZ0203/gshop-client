@@ -14,7 +14,7 @@
             <section class="login_message">
               <input type="text" maxlength="11" placeholder="手机号" v-model="phone">
               <button :disabled="!isRightPhone || computeTime>0" class="get_verification"
-                      :class="{right_phone_number: isRightPhone}" @click="sendCode">
+                      :class="{right_phone_number: isRightPhone}" @click.prevent="sendCode">
                 {{computeTime > 0 ? `已发送(${computeTime}s)` : '获取验证码'}}
               </button>
             </section>
@@ -74,15 +74,27 @@
     },
     methods: {
       //发送短信验证码
-      sendCode() {
+      async sendCode() {
         this.computeTime = 30;
         const intervalId = setInterval(() => {
-          if (this.computeTime === 0) {
+          if (this.computeTime <= 0) {
             clearInterval(intervalId);
+            this.computeTime = 0;
             return
           }
-          this.computeTime--
-        }, 1000)
+          this.computeTime--;
+        }, 1000);
+
+        //发送请求发送短信验证码
+        const result = await reqSendCode(this.phone);
+        if (result.code === 0) {
+          Toast('已发送')
+        } else {
+          this.computeTime = 0;
+          MessageBox.alert(result.msg).then(action => {
+            console.log('点击确定')
+          })
+        }
       },
 
       //获取图形验证码
@@ -94,38 +106,38 @@
       async login() {
         let result;
 
-        if (this.loginWay) { //短信登陆
+        if(this.loginWay) { // 短信
           const {phone, code} = this;
-          if (!this.isRightPhone) {
+          if(!this.isRightPhone) {
             return MessageBox.alert('请输入正确的手机号！')
           } else if (!/^\d{6}$/.test(code)) {
             return MessageBox.alert('请输入正确的验证码！')
           }
-          //发送请求登陆
+          // 发登陆的请求
           result = await reqSmsLogin(phone, code)
         } else { //密码登陆
           const {name, pwd, captcha} = this;
-          if (!name) {
-            return MessageBox.alert('请输入用户名！')
+          if(!name) {
+            return MessageBox.alert('请输入用户名!')
           } else if (!pwd) {
             return MessageBox.alert('请输入密码！')
           } else if (!/^.{4}$/.test(captcha)) {
             return MessageBox.alert('请输入正确的验证码！')
           }
           //发送请求登陆
-          result = await reqPwdLogin(name, pwd, captcha);
+          result = await reqPwdLogin({name, pwd, captcha});
           //请求结束后，停止倒计时
           this.computeTime = 0;
           //更新图形验证码
           this.updataCaptcha();
           //根据请求结果进行相应的处理
-          if (result.code === 0) {
+          if(result.code===0) { // 成功
             const user = result.data;
-            //保存用户信息到user中
-            this.$store.dispatch('saveUser',user);
-            //跳转到个人中心页面
+            // 将user保存到state
+            this.$store.dispatch('saveUser', user);
+            // 跳转到个人中心界面
             this.$router.replace('/profile')
-          } else {
+          } else { // 失败
             MessageBox.alert(result.msg)
           }
         }
