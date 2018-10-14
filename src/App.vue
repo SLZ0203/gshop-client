@@ -10,7 +10,11 @@
 
   export default {
     mounted() {
+      //异步获取地址，并保存到state
       this.$store.dispatch('getAddress');
+      //异步获取user，并保存到state
+      this.$store.dispatch('getUser');
+
     },
     components: {
       FooterGuide

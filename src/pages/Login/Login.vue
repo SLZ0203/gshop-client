@@ -103,44 +103,47 @@
       },
 
       //请求登陆
-      async login() {
+      async login () {
         let result;
-
+        // 进行前台表单验证
         if(this.loginWay) { // 短信
           const {phone, code} = this;
           if(!this.isRightPhone) {
-            return MessageBox.alert('请输入正确的手机号！')
+            return MessageBox.alert('请输入正确手机号')
           } else if (!/^\d{6}$/.test(code)) {
-            return MessageBox.alert('请输入正确的验证码！')
+            return MessageBox.alert('请输入正确验证码')
           }
           // 发登陆的请求
           result = await reqSmsLogin(phone, code)
-        } else { //密码登陆
+        } else { // 密码
           const {name, pwd, captcha} = this;
           if(!name) {
-            return MessageBox.alert('请输入用户名!')
+            return MessageBox.alert('用户名必须指定')
           } else if (!pwd) {
-            return MessageBox.alert('请输入密码！')
+            return MessageBox.alert('密码必须指定')
           } else if (!/^.{4}$/.test(captcha)) {
-            return MessageBox.alert('请输入正确的验证码！')
+            return MessageBox.alert('请输入正确验证码')
           }
-          //发送请求登陆
-          result = await reqPwdLogin({name, pwd, captcha});
-          //请求结束后，停止倒计时
-          this.computeTime = 0;
-          //更新图形验证码
-          this.updataCaptcha();
-          //根据请求结果进行相应的处理
-          if(result.code===0) { // 成功
-            const user = result.data;
-            // 将user保存到state
-            this.$store.dispatch('saveUser', user);
-            // 跳转到个人中心界面
-            this.$router.replace('/profile')
-          } else { // 失败
-            MessageBox.alert(result.msg)
-          }
+          // 发登陆的请求
+          result = await reqPwdLogin({name, pwd, captcha})
         }
+
+        // 请求结束后, 停止倒计时
+        this.computeTime = 0;
+        // 更新验证码
+        this.updataCaptcha();
+
+        // 根据请求的结果进行相应处理
+        if(result.code===0) { // 成功
+          const user = result.data;
+          // 将user保存到state
+          this.$store.dispatch('saveUser', user);
+          // 跳转到个人中心界面
+          this.$router.replace('/profile')
+        } else { // 失败
+          MessageBox.alert(result.msg)
+        }
+
       }
     },
     computed: {
