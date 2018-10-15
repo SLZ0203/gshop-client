@@ -1,6 +1,7 @@
 /*
 包含n个用于直接更新状态数据方法的对象
  */
+import Vue from 'vue'
 import {
   RECEIVE_ADDRESS,
   RECEIVE_CATEGORYS,
@@ -43,21 +44,15 @@ export default {
     state.goods = goods
   },
   [INCREMENT_FOOD_COUNT](state, {food}) {
-    if (!food.count) { // 第一次增加时, 没有count
-      // food.count = 1 // 添加count属性, 并指定为1
-      // 问题: 新添加的属性没有数据劫持==>数据绑定==>更新了数据但界面不变
-      Vue.set(food, 'count', 1) // 给有数据绑定的对象添加指定属性名和值的属性(有绑定)
-      state.shopCart.push(food) // 添加到购物车
-    } else { // 有count
+    if (food.count) {
       food.count++
+    } else {
+      Vue.set(food, 'count', 1)
     }
   },
   [DECREMENT_FOOD_COUNT](state, {food}) {
-    if (food.count) { // count有值才减1
-      food.count--;
-      if (food.count === 0) {// 如果数量减为0, 从购物车中移除
-        state.shopCart.splice(state.shopCart.indexOf(food), 1)
-      }
+    if (food.count) {
+      food.count--
     }
   },
 }

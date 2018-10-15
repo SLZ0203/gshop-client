@@ -14,10 +14,8 @@
     },
 
     methods: {
-      // 更新food的count
       updateFoodCount(isAdd) {
         const {food} = this;
-        // 通知action更新
         this.$store.dispatch('updateFoodCount', {food, isAdd})
       }
     }
@@ -40,6 +38,11 @@
       line-height 24px
       font-size 24px
       color $green
+      &.move-enter-active, &.move-leave-active
+        transition all .5s
+      &.move-enter, &.move-leave-to
+        opacity 0
+        transform translateX(20px) rotate(180deg)
     .cart-count
       display: inline-block
       vertical-align: top
