@@ -17,7 +17,8 @@
           <li class="food-list-hook" v-for="(good, index) in goods" :key="index">
             <h1 class="title">{{good.name}}</h1>
             <ul>
-              <li class="food-item bottom-border-1px" v-for="(food, index) in good.foods" :key="index">
+              <li class="food-item bottom-border-1px" v-for="(food, index) in good.foods"
+                  :key="index" @click="showFood(food)">
                 <div class="icon">
                   <img width="57" height="57" :src="food.icon">
                 </div>
@@ -40,19 +41,25 @@
           </li>
         </ul>
       </div>
+      <ShopCart/>
     </div>
+    <Food :food="food" ref="food"/>
   </div>
 </template>
 <script>
   import {mapState} from 'vuex'
   import BScroll from 'better-scroll'
+  import Food from '../../../components/Food/Food.vue'
+  import ShopCart from '../../../components/ShopCart/ShopCart.vue'
   export default {
     data() {
       return {
         scrollY: 0,    // 右侧列表Y轴方向滑动的坐标
-        tops: [],     // 右侧分类li的top值组成的数组
+        tops: [], // 右侧分类li的top值组成的数组
+        food: {}
       }
     },
+
     computed: {
       ...mapState(['goods']),
       currentIndex() {
@@ -69,6 +76,7 @@
         return index
       }
     },
+
     mounted() {
       this.$store.dispatch('getGoods', () => {
         this.$nextTick(() => {
@@ -77,6 +85,7 @@
         })
       });
     },
+
     methods: {
       _initScroll() {
         //左侧列表创建的滑动
@@ -118,7 +127,16 @@
         this.scrollY = -y;
         // 让右侧列表滚动到此处
         this.rightScroll.scrollTo(0, y, 300)
+      },
+      showFood(food) {
+        this.food = food;
+        this.$refs.food.toggleShow()
       }
+    },
+
+    components: {
+      Food,
+      ShopCart
     }
   }
 </script>
@@ -128,7 +146,7 @@
   .goods
     display: flex
     position: absolute
-    top: 275px
+    top: 255px
     bottom: 46px
     width: 100%
     background: #fff;

@@ -9,7 +9,7 @@ import {
   reqLogout,
   reqInfo,
   reqRatings,
-  reqGoods
+  reqGoods,
 } from '../api'
 
 import {
@@ -22,7 +22,8 @@ import {
   RECEIVE_RATINGS,
   RECEIVE_INFO,
   INCREMENT_FOOD_COUNT,
-  DECREMENT_FOOD_COUNT
+  DECREMENT_FOOD_COUNT,
+  CLEAR_CART
 } from './mutation-types'
 
 export default {
@@ -97,11 +98,13 @@ export default {
   },
 
   // 异步获取ratings数据
-  async getRatings({commit}) {
+  async getRatings({commit}, cb) {
     const result = await reqRatings();
     if (result.code === 0) {
       const ratings = result.data;
-      commit(RECEIVE_RATINGS, {ratings})
+      commit(RECEIVE_RATINGS, {ratings});
+      // 在更新状态后立即调用
+      typeof cb === 'function' && cb()
     }
   },
 
@@ -122,5 +125,9 @@ export default {
       commit(DECREMENT_FOOD_COUNT, {food})
     }
   },
+
+  clearCart({commit}) {
+    commit(CLEAR_CART)
+  }
 
 }

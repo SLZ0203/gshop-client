@@ -11,5 +11,3 @@ Mock.mock('/ratings', {code: 0, data: data.ratings});
 /*mock提供info数据接口*/
 Mock.mock('/info', {code: 0, data: data.info});
 
-// 向外暴露什么?  不需要
-console.log('mockserver 运行了');

@@ -3,48 +3,49 @@
     <div class="ratings-content">
       <div class="overview">
         <div class="overview-left">
-          <h1 class="score">4.5</h1>
+          <h1 class="score">{{info.score}}</h1>
           <div class="title">综合评分</div>
-          <div class="rank">高于周边商家90%</div>
+          <div class="rank">高于周边商家{{info.rankRate}}%</div>
         </div>
         <div class="overview-right">
           <div class="score-wrapper">
             <span class="title">服务态度</span>
-            <div>Star组件</div>
-            <span class="score">4.4</span>
+            <Star :score="info.serviceScore" :size="36"/>
+            <span class="score">{{info.serviceScore}}</span>
           </div>
           <div class="score-wrapper">
             <span class="title">商品评分</span>
-            <div>Star组件</div>
-            <span class="score">4.6</span></div>
+            <Star :score="info.foodScore" :size="36"/>
+            <span class="score">{{info.foodScore}}</span></div>
           <div class="delivery-wrapper">
             <span class="title">送达时间</span>
-            <span class="delivery">30分钟</span>
+            <span class="delivery">{{info.deliveryTime}}分钟</span>
           </div>
         </div>
       </div>
 
-      <div class="split"></div>
+      <Split/>
 
-      <div>RatingSelect组件</div>
+      <RatingsFilter :selectType="selectType" :onlyContent="onlyContent"
+                     @setSelectType="setSelectType" @toggleOnlyContent="toggleOnlyContent"/>
 
       <div class="rating-wrapper">
         <ul>
-          <li class="rating-item">
+          <li class="rating-item" v-for="(rating, index) in filterRatings" :key="index">
             <div class="avatar">
-              <img width="28" height="28" src="http://static.galileo.xiaojukeji.com/static/tms/default_header.png">
+              <img width="28" height="28" :src="rating.avatar">
             </div>
             <div class="content">
-              <h1 class="name">xxx</h1>
+              <h1 class="name">{{rating.username}}</h1>
               <div class="star-wrapper">
-                <div>Star组件</div>
-                <span class="delivery">30</span>
+                <Star :score="rating.score" :size="24"/>
+                <span class="delivery">{{rating.deliveryTime}}</span>
               </div>
-              <p class="text">还可以</p>
+              <p class="text">{{rating.text}}</p>
               <div class="recommend">
-                <span class="iconfont icon-thumb_up"></span>
+                <span class="iconfont" :class="rating.rateType === 0 ? 'icon-thumb_up' : 'icon-thumb_down'"></span>
               </div>
-              <div class="time">2016-12-11 12:02:13</div>
+              <div class="time">{{rating.rateTime | date-format}}</div>
             </div>
           </li>
         </ul>
@@ -53,11 +54,48 @@
   </div>
 </template>
 <script>
+  import {mapState} from 'vuex'
+  import BScroll from 'better-scroll'
+  import Star from '../../../components/Star/Star.vue'
+  import RatingsFilter from '../../../components/RatingsFilter/RatingsFilter.vue'
+
   export default {
     data() {
-      return {}
+      return {
+        selectType: 2,
+        onlyContent: false
+      }
     },
-    components: {}
+    mounted() {
+      this.$store.dispatch('getRatings', () => {
+        this.$nextTick(() => {
+          new BScroll('.ratings', {click: true})
+        })
+      })
+    },
+    computed: {
+      ...mapState(['info', 'ratings']),
+      filterRatings() {
+        const {ratings, selectType, onlyContent} = this;
+        return ratings.filter(rating => {
+          const {rateType, text} = rating;
+          return (selectType === 2 || selectType === rateType) && (!onlyContent || text.length > 0)
+        })
+      }
+
+    },
+    methods: {
+      setSelectType(selectType) {
+        this.selectType = selectType
+      },
+      toggleOnlyContent() {
+        this.onlyContent = !this.onlyContent
+      }
+    },
+    components: {
+      Star,
+      RatingsFilter
+    }
   }
 </script>
 <style lang="stylus" rel="stylesheet/stylus">
@@ -65,7 +103,7 @@
 
   .ratings
     position: absolute
-    top: 174px
+    top: 255px
     bottom: 0
     left: 0
     width: 100%
@@ -122,6 +160,7 @@
             color: rgb(255, 153, 0)
         .delivery-wrapper
           font-size: 0
+          margin-left 14px
           .title
             line-height: 18px
             font-size: 12px
@@ -194,4 +233,5 @@
             font-size: 10px
             color: rgb(147, 153, 159)
 </style>
+
 

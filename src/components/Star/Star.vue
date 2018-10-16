@@ -4,38 +4,48 @@
   </div>
 </template>
 <script>
-  const CLASS_ON = 'on';
-  const CLASS_HALF = 'half';
-  const CLASS_OFF = 'off';
+
+  const CLASS_ON = 'on'
+  const CLASS_HALF = 'half'
+  const CLASS_OFF = 'off'
 
   export default {
     props: {
-      score: Number,
-      size: Number
+      score: Number, // 评分
+      size: Number, // 尺寸
     },
+
     computed: {
-      starClasses() {
-        const scs = [];
-        const {score} = this;
-        const scoreInteger = Math.floor(score);
-        // 添加类名CLASS_ON
+      /*
+      3.5: 3 + 1 + 1
+       */
+      starClasses () {
+        const scs = []
+
+        const {score} = this
+        const scoreInteger = Math.floor(score)
+
+        // 向scs中添加n个CLASS_ON
         for (let i = 0; i < scoreInteger; i++) {
           scs.push(CLASS_ON)
         }
-        // 添加类名CLASS_HALF
-        if (score*10 - scoreInteger*10 >= 5) {
+
+        // 向scs中添加1/0个CLASS_HALF
+        if(score*10-scoreInteger*10>=5) {
           scs.push(CLASS_HALF)
         }
-        // 添加类名CLASS_OFF
-        while (scs.length < 5) {
+
+        // 向scs中添加n个CLASS_OFF
+        while(scs.length<5) {
           scs.push(CLASS_OFF)
         }
+
         return scs
       }
     }
   }
 </script>
-<style lang="stylus" rel="stylesheet/stylus">
+<style lang="stylus" type="text/stylus" rel="stylesheet/stylus">
   @import "../../common/stylus/mixins.styl"
 
   .star //2x图 3x图

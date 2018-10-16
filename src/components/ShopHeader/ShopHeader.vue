@@ -131,7 +131,7 @@
     .shop-nav
       background-size cover
       background-repeat no-repeat
-      height 70px
+      height 50px
       padding 5px 10px
       position relative
       &::before
